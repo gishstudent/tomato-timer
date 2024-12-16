@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Pomodoro Timer</title> <!-- Title changed here -->
+  <title>Pomodoro Timer</title>
   <style>
     /* General Body Styling */
     body {
@@ -13,38 +13,40 @@
       align-items: center;
       height: 100vh;
       margin: 0;
-      background: linear-gradient(135deg, #6e7fd0, #8a87e2);
+
+      /* 背景圖片設置 */
+      background: url('https://gishstudent.github.io/tomato-timer/img/pomodoro.jpg') no-repeat center center fixed;
+      background-size: contain; /* 圖片完整顯示，適中大小 */
+      background-color: #f8f8f8; /* 預設背景色 */
       color: #333;
       overflow: hidden;
     }
 
-    /* Container Styling */
-    .container {
-      text-align: center;
-      background: #fff;
-      padding: 40px;
-      border-radius: 15px;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-      width: 300px;
-    }
-
-    /* Heading Styling */
-    h1 {
-      font-size: 2.5em;
-      color: #4CAF50;
-      margin-bottom: 20px;
-      font-weight: bold;
-    }
-
-    /* Timer Display */
+    /* Timer Display (置中，背景為白色) */
     #timer {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
       font-size: 72px;
       font-weight: 700;
-      margin-bottom: 30px;
       color: #333;
+      background-color: rgba(255, 255, 255, 0.9); /* 白色背景帶一點透明度 */
+      padding: 20px 40px;
+      border-radius: 15px; /* 圓角效果 */
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+      text-align: center;
     }
 
     /* Button Styling */
+    .buttons {
+      position: absolute;
+      top: 70%; /* 按鈕顯示在下方 */
+      left: 50%;
+      transform: translateX(-50%);
+      text-align: center;
+    }
+
     button {
       padding: 12px 30px;
       font-size: 16px;
@@ -71,106 +73,92 @@
     button:hover {
       transform: scale(1.05);
     }
-
-    /* Button Active (pressed) */
-    button:active {
-      transform: scale(1);
-    }
-
-    /* Responsive Styling */
-    @media (max-width: 480px) {
-      .container {
-        padding: 20px;
-        width: 250px;
-      }
-
-      #timer {
-        font-size: 56px;
-      }
-
-      h1 {
-        font-size: 2em;
-      }
-    }
   </style>
 </head>
 <body>
-  <div class="container">
-    <h1>Pomodoro Timer</h1> <!-- Title in header changed here -->
-    <div id="timer">25:00</div>
+  <!-- Timer Display -->
+  <div id="timer">25:00</div>
+
+  <!-- Buttons -->
+  <div class="buttons">
     <button id="start-btn">Start</button>
     <button id="reset-btn">Reset</button>
   </div>
 
   <script>
-    let workTime = 25 * 60; // Work time (test with 0.1 minute)
-    let breakTime = 5 * 60; // Break time (test with 0.1 minute)
+    let workTime = 25 * 60; // 工作時間：25 分鐘
+    let breakTime = 5 * 60; // 休息時間：5 分鐘
     let currentTimer = workTime;
-    let isWorkPhase = true; // Work phase
-    let isRunning = false; // Timer running status
-    let timerInterval; // Interval for setInterval ID
+    let isWorkPhase = true; // 是否為工作階段
+    let isRunning = false; // 計時器運行狀態
+    let timerInterval; // setInterval ID
 
     const timerDisplay = document.getElementById("timer");
     const startBtn = document.getElementById("start-btn");
     const resetBtn = document.getElementById("reset-btn");
 
-    // Update the timer display
+    // 更新顯示的時間
     function updateDisplay() {
       const minutes = Math.floor(currentTimer / 60);
       const seconds = currentTimer % 60;
       timerDisplay.textContent = `${minutes.toString().padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
     }
 
-    // Countdown function
+    // 倒數計時
     function countdown() {
       if (currentTimer > 0) {
         currentTimer--;
         updateDisplay();
       } else {
         clearInterval(timerInterval);
+        isRunning = false;
+
+        // 提示階段切換
         if (isWorkPhase) {
-          alert("Time's up! Time to take a break.");
+          alert("時間到！休息一下吧！");
           currentTimer = breakTime;
         } else {
-          alert("Break's over! Time to work.");
+          alert("休息結束！繼續工作吧！");
           currentTimer = workTime;
         }
-        isWorkPhase = !isWorkPhase; // Switch between work and break phases
-        startCountdown(); // Start the next phase automatically
+        isWorkPhase = !isWorkPhase; // 切換階段
+
+        updateDisplay();
+        startCountdown();
       }
     }
 
-    // Start or resume the countdown
+    // 開始或繼續倒數
     function startCountdown() {
       if (!isRunning) {
         isRunning = true;
-        startBtn.textContent = "Pause"; // Change button text
+        startBtn.textContent = "Pause";
         timerInterval = setInterval(countdown, 1000);
       } else {
         pauseCountdown();
       }
     }
 
-    // Pause the countdown
+    // 暫停倒數
     function pauseCountdown() {
       isRunning = false;
-      startBtn.textContent = "Start"; // Change button text
+      startBtn.textContent = "Start";
       clearInterval(timerInterval);
     }
 
-    // Reset the timer
+    // 重設計時器
     function resetTimer() {
       pauseCountdown();
-      isWorkPhase = true;
+      isWorkPhase = true; // 回到工作階段
       currentTimer = workTime;
       updateDisplay();
     }
 
-    // Button events
+    // 綁定按鈕事件
     startBtn.addEventListener("click", startCountdown);
     resetBtn.addEventListener("click", resetTimer);
 
-    // Initialize the display
+    // 初始化顯示時間
     updateDisplay();
   </script>
 </body>
