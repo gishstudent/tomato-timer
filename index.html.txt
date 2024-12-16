@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pomodoro Timer</title> <!-- Title changed here -->
+  <style>
+    /* General Body Styling */
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      background: linear-gradient(135deg, #6e7fd0, #8a87e2);
+      color: #333;
+      overflow: hidden;
+    }
+
+    /* Container Styling */
+    .container {
+      text-align: center;
+      background: #fff;
+      padding: 40px;
+      border-radius: 15px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+      width: 300px;
+    }
+
+    /* Heading Styling */
+    h1 {
+      font-size: 2.5em;
+      color: #4CAF50;
+      margin-bottom: 20px;
+      font-weight: bold;
+    }
+
+    /* Timer Display */
+    #timer {
+      font-size: 72px;
+      font-weight: 700;
+      margin-bottom: 30px;
+      color: #333;
+    }
+
+    /* Button Styling */
+    button {
+      padding: 12px 30px;
+      font-size: 16px;
+      margin: 10px;
+      border: none;
+      border-radius: 30px;
+      cursor: pointer;
+      transition: all 0.3s ease-in-out;
+    }
+
+    /* Start Button (Green) */
+    #start-btn {
+      background-color: #4CAF50;
+      color: white;
+    }
+
+    /* Reset Button (Red) */
+    #reset-btn {
+      background-color: #f44336;
+      color: white;
+    }
+
+    /* Button Hover Effects */
+    button:hover {
+      transform: scale(1.05);
+    }
+
+    /* Button Active (pressed) */
+    button:active {
+      transform: scale(1);
+    }
+
+    /* Responsive Styling */
+    @media (max-width: 480px) {
+      .container {
+        padding: 20px;
+        width: 250px;
+      }
+
+      #timer {
+        font-size: 56px;
+      }
+
+      h1 {
+        font-size: 2em;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Pomodoro Timer</h1> <!-- Title in header changed here -->
+    <div id="timer">25:00</div>
+    <button id="start-btn">Start</button>
+    <button id="reset-btn">Reset</button>
+  </div>
+
+  <script>
+    let workTime = 25 * 60; // Work time (test with 0.1 minute)
+    let breakTime = 5 * 60; // Break time (test with 0.1 minute)
+    let currentTimer = workTime;
+    let isWorkPhase = true; // Work phase
+    let isRunning = false; // Timer running status
+    let timerInterval; // Interval for setInterval ID
+
+    const timerDisplay = document.getElementById("timer");
+    const startBtn = document.getElementById("start-btn");
+    const resetBtn = document.getElementById("reset-btn");
+
+    // Update the timer display
+    function updateDisplay() {
+      const minutes = Math.floor(currentTimer / 60);
+      const seconds = currentTimer % 60;
+      timerDisplay.textContent = `${minutes.toString().padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
+    }
+
+    // Countdown function
+    function countdown() {
+      if (currentTimer > 0) {
+        currentTimer--;
+        updateDisplay();
+      } else {
+        clearInterval(timerInterval);
+        if (isWorkPhase) {
+          alert("Time's up! Time to take a break.");
+          currentTimer = breakTime;
+        } else {
+          alert("Break's over! Time to work.");
+          currentTimer = workTime;
+        }
+        isWorkPhase = !isWorkPhase; // Switch between work and break phases
+        startCountdown(); // Start the next phase automatically
+      }
+    }
+
+    // Start or resume the countdown
+    function startCountdown() {
+      if (!isRunning) {
+        isRunning = true;
+        startBtn.textContent = "Pause"; // Change button text
+        timerInterval = setInterval(countdown, 1000);
+      } else {
+        pauseCountdown();
+      }
+    }
+
+    // Pause the countdown
+    function pauseCountdown() {
+      isRunning = false;
+      startBtn.textContent = "Start"; // Change button text
+      clearInterval(timerInterval);
+    }
+
+    // Reset the timer
+    function resetTimer() {
+      pauseCountdown();
+      isWorkPhase = true;
+      currentTimer = workTime;
+      updateDisplay();
+    }
+
+    // Button events
+    startBtn.addEventListener("click", startCountdown);
+    resetBtn.addEventListener("click", resetTimer);
+
+    // Initialize the display
+    updateDisplay();
+  </script>
+</body>
+</html>
