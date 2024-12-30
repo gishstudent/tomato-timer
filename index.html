@@ -20,37 +20,45 @@
       background-color: #f8f8f8; /* 預設背景色 */
       color: #333;
       overflow: hidden;
+      flex-direction: column; /* Flex方向設為列，方便顯示標題、計時器和按鈕 */
     }
 
-    /* Timer Display (置中，背景為白色) */
+    /* Title Styling */
+    #title {
+      position: absolute; /* Absolute positioning */
+      top: 20px; /* Set distance from the top */
+      left: 20px; /* Set distance from the left */
+      font-size: 48px; /* Larger font size */
+      font-weight: 700;
+      color: #FF6347; /* Tomato color for the title */
+      text-shadow: 3px 3px 10px rgba(0, 0, 0, 0.5); /* Text shadow to make it pop */
+      font-family: 'Comic Sans MS', cursive, sans-serif; /* Fun font family */
+      letter-spacing: 2px; /* Add letter spacing for style */
+    }
+
+    /* Timer Display */
     #timer {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
       font-size: 72px;
       font-weight: 700;
       color: #333;
-      background-color: rgba(255, 255, 255, 0.9); /* 白色背景帶一點透明度 */
+      background-color: rgba(255, 255, 255, 0.9);
       padding: 20px 40px;
-      border-radius: 15px; /* 圓角效果 */
+      border-radius: 15px;
       box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
       text-align: center;
+      margin-bottom: 30px;
     }
 
-    /* Button Styling */
+    /* Button Container Styling */
     .buttons {
-      position: absolute;
-      top: 70%; /* 按鈕顯示在下方 */
-      left: 50%;
-      transform: translateX(-50%);
-      text-align: center;
+      display: flex;
+      justify-content: center;
+      gap: 20px;
     }
 
     button {
       padding: 12px 30px;
       font-size: 16px;
-      margin: 10px;
       border: none;
       border-radius: 30px;
       cursor: pointer;
@@ -73,9 +81,30 @@
     button:hover {
       transform: scale(1.05);
     }
+
+    /* Stats Container - Position at Bottom Right */
+    #stats {
+      position: absolute;
+      bottom: 20px; /* Distance from the bottom */
+      right: 20px; /* Distance from the right */
+      font-size: 18px;
+      color: #333;
+      font-family: 'Arial', sans-serif;
+      background-color: rgba(255, 255, 255, 0.8);
+      padding: 10px;
+      border-radius: 10px;
+      box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+    }
+
+    #stats span {
+      display: block;
+    }
   </style>
 </head>
 <body>
+  <!-- Title -->
+  <div id="title">Tomato Timer</div>
+
   <!-- Timer Display -->
   <div id="timer">25:00</div>
 
@@ -83,6 +112,12 @@
   <div class="buttons">
     <button id="start-btn">Start</button>
     <button id="reset-btn">Reset</button>
+  </div>
+
+  <!-- Stats Display -->
+  <div id="stats">
+    <span id="session-count">Pomodoro Sessions: 0</span>
+    <span id="break-count">Breaks Taken: 0</span>
   </div>
 
   <script>
@@ -93,15 +128,27 @@
     let isRunning = false; // 計時器運行狀態
     let timerInterval; // setInterval ID
 
+    // Stats tracking
+    let pomodoroSessions = 0; // Total Pomodoro sessions (work + break)
+    let breaksTaken = 0; // Total breaks taken
+
     const timerDisplay = document.getElementById("timer");
     const startBtn = document.getElementById("start-btn");
     const resetBtn = document.getElementById("reset-btn");
+    const sessionCountDisplay = document.getElementById("session-count");
+    const breakCountDisplay = document.getElementById("break-count");
 
     // 更新顯示的時間
     function updateDisplay() {
       const minutes = Math.floor(currentTimer / 60);
       const seconds = currentTimer % 60;
       timerDisplay.textContent = `${minutes.toString().padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
+    }
+
+    // 更新統計數據
+    function updateStats() {
+      sessionCountDisplay.textContent = `Pomodoro Sessions: ${pomodoroSessions}`;
+      breakCountDisplay.textContent = `Breaks Taken: ${breaksTaken}`;
     }
 
     // 倒數計時
@@ -117,13 +164,16 @@
         if (isWorkPhase) {
           alert("時間到！休息一下吧！");
           currentTimer = breakTime;
+          breaksTaken++;
         } else {
           alert("休息結束！繼續工作吧！");
           currentTimer = workTime;
+          pomodoroSessions++;
         }
         isWorkPhase = !isWorkPhase; // 切換階段
 
         updateDisplay();
+        updateStats();
         startCountdown();
       }
     }
@@ -151,7 +201,10 @@
       pauseCountdown();
       isWorkPhase = true; // 回到工作階段
       currentTimer = workTime;
+      pomodoroSessions = 0; // Reset sessions count
+      breaksTaken = 0; // Reset breaks count
       updateDisplay();
+      updateStats();
     }
 
     // 綁定按鈕事件
@@ -160,6 +213,7 @@
 
     // 初始化顯示時間
     updateDisplay();
+    updateStats();
   </script>
 </body>
 </html>
